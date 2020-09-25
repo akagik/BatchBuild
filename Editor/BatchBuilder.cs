@@ -1,4 +1,6 @@
-﻿namespace BatchBuild
+﻿using System;
+
+namespace BatchBuild
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -34,7 +36,7 @@
                 }
             }
 
-            Debug.Log($"[ScriptLog] Start Build {buildConfig.targetPlatform}");
+            Debug.Log($"[ScriptLog] Start Build {buildConfig.targetPlatform}({buildConfig.buildNumber}) - {buildConfig.version}");
 
             BuildReport report = null;
 
@@ -79,8 +81,12 @@
                 EditorUserBuildSettings.iOSBuildConfigType = iOSBuildType.Debug;
             }
 
-            // ビルドナンバーの更新
+            // ビルドナンバーなどの更新
             PlayerSettings.iOS.buildNumber = config.buildNumber;
+            if (!string.IsNullOrWhiteSpace(config.version))
+            {
+                PlayerSettings.bundleVersion = config.version;
+            }
 
             // ビルド実行
             string[] scenes = GetBuildScenePaths();
@@ -98,8 +104,13 @@
             SetupCommonSettings(config);
             SetAndroidArchitechture(config);
 
-            // ビルドナンバーの更新
+            // ビルドナンバーなどの更新
             PlayerSettings.Android.bundleVersionCode = int.Parse(config.buildNumber);
+
+            if (!string.IsNullOrWhiteSpace(config.version))
+            {
+                PlayerSettings.bundleVersion = config.version;
+            }
 
             // ビルド実行
             string[] scenes = GetBuildScenePaths();
@@ -136,14 +147,11 @@
             EditorUserBuildSettings.buildAppBundle = config.isRelease && config.buildAppBundle;
             EditorUserBuildSettings.androidBuildType = AndroidBuildType.Debug;
 
-            // NOTE: 一旦 proguard 外しておく
-//        EditorUserBuildSettings.androidDebugMinification = AndroidMinification.Proguard;
-//        EditorUserBuildSettings.androidReleaseMinification = AndroidMinification.Proguard;
+            EditorUserBuildSettings.androidDebugMinification = config.debugMinification;
+            EditorUserBuildSettings.androidReleaseMinification = config.releaseMinification;
 
             EditorUserBuildSettings.androidDebugMinification = AndroidMinification.None;
             EditorUserBuildSettings.androidReleaseMinification = AndroidMinification.None;
-
-            EditorUserBuildSettings.androidUseLegacySdkTools = false;
         }
 
         private static void SetAndroidKeyStoreSetting(MyBuildConfig config)
@@ -154,18 +162,6 @@
             PlayerSettings.Android.keystorePass = config.keystorePass;
             PlayerSettings.Android.keyaliasName = config.keyaliasName;
             PlayerSettings.Android.keyaliasPass = config.keyaliasPass;
-        }
-
-        private static MyBuildConfig LoadDefaultBuildConfig()
-        {
-            var table = LoadOnlyOneAsset<MyBuildConfig>("t:MyBuildConfig");
-            if (table == null)
-            {
-                Debug.LogWarning("Create a new build config because of missing a default config");
-                return ScriptableObject.CreateInstance<MyBuildConfig>();
-            }
-
-            return table;
         }
 
         private static void SetAndroidArchitechture(MyBuildConfig config)
@@ -205,6 +201,10 @@
                         config.buildNumber = (args[i + 1]).ToString();
                         i += 1;
                         break;
+                    case "--version":
+                        config.version = (args[i + 1]);
+                        i += 1;
+                        break;
                     case "--build-app-bundle":
                         config.buildAppBundle = true;
                         break;
@@ -242,6 +242,19 @@
                         break;
                     case "--keyalias-pass":
                         config.keyaliasPass = (args[i + 1]).ToString();
+                        i += 1;
+                        break;
+                    case "--minification":
+
+                        if (Enum.TryParse(args[i + 1], true, out AndroidMinification result))
+                        {
+                            config.debugMinification = result;
+                            config.releaseMinification = result;
+                        }
+                        else
+                        {
+                            Debug.LogError("無効な引数をスキップ: " + args[i + 1]);
+                        }
                         i += 1;
                         break;
                 }

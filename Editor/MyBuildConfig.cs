@@ -9,18 +9,23 @@
         public BuildTarget targetPlatform;
         public string buildPath;
         public string buildNumber;
+        public string version;
+        
         public bool isRelease = false;
         public string commitId;
 
         // Android key store settings
         [Header("Android")]
         public bool buildAppBundle;
-
         public bool il2cpp;
+        public AndroidMinification debugMinification;
+        public AndroidMinification releaseMinification;
+        
         public string keystorePath;
         public string keystorePass;
         public string keyaliasName;
         public string keyaliasPass;
+        
 
         // Common Debugs
         [Header("Debug (isRealse が false のときのみ有効)")]
