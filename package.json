@@ -1,0 +1,13 @@
+{
+  "name": "com.kc-works.batchbuild",
+  "version": "0.0.1",
+  "displayName": "Batch Build",
+  "description": "This package is used for Jenkins to build.",
+  "unity": "2019.4",
+  "author": {
+    "name": "Kohei Imatomi",
+    "email": "kohei.imatomi@gmail.com",
+    "url": "http://kc-works.com/"
+  },
+  "hideInEditor": false
+}
