@@ -82,7 +82,11 @@ namespace BatchBuild
             }
 
             // ビルドナンバーなどの更新
-            PlayerSettings.iOS.buildNumber = config.buildNumber;
+            if (!string.IsNullOrWhiteSpace(config.buildNumber))
+            {
+                PlayerSettings.iOS.buildNumber = config.buildNumber;
+            }
+            
             if (!string.IsNullOrWhiteSpace(config.version))
             {
                 PlayerSettings.bundleVersion = config.version;
@@ -105,7 +109,10 @@ namespace BatchBuild
             SetAndroidArchitechture(config);
 
             // ビルドナンバーなどの更新
-            PlayerSettings.Android.bundleVersionCode = int.Parse(config.buildNumber);
+            if (!string.IsNullOrWhiteSpace(config.buildNumber))
+            {
+                PlayerSettings.Android.bundleVersionCode = int.Parse(config.buildNumber);
+            }
 
             if (!string.IsNullOrWhiteSpace(config.version))
             {
