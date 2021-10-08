@@ -38,16 +38,25 @@ namespace BatchBuild
 
             Debug.Log($"[ScriptLog] Start Build {buildConfig.targetPlatform}({buildConfig.buildNumber}) - {buildConfig.version}");
 
-            BuildReport report = null;
+            // 各種設定
+            SetupCommonSettings(buildConfig);
 
+            // プラットフォーム別の設定
             if (buildConfig.targetPlatform == BuildTarget.iOS)
             {
-                report = BuildiOS(buildConfig);
+                SetiOSSettings(buildConfig);
             }
-            else
+            else if (buildConfig.targetPlatform == BuildTarget.Android)
             {
-                report = BuildAndroid(buildConfig);
+                SetAndroidSettings(buildConfig);
             }
+            
+            // ビルド実行
+            string[] scenes = GetBuildScenePaths();
+            BuildOptions opt = BuildOptions.CompressWithLz4;
+            string buildPath = GetBuildPathOrDefault(buildConfig);
+
+            BuildReport report = BuildPipeline.BuildPlayer(scenes, buildPath, buildConfig.targetPlatform, opt);
 
             // レポート表示
             if (report.summary.result == BuildResult.Succeeded)
@@ -85,11 +94,8 @@ namespace BatchBuild
             }
         }
 
-        public static BuildReport BuildiOS(MyBuildConfig config)
+        public static void SetiOSSettings(MyBuildConfig config)
         {
-            // 各種設定
-            SetupCommonSettings(config);
-
             if (config.isRelease)
             {
                 EditorUserBuildSettings.iOSBuildConfigType = iOSBuildType.Release;
@@ -104,26 +110,13 @@ namespace BatchBuild
             {
                 PlayerSettings.iOS.buildNumber = config.buildNumber;
             }
-            
-            if (!string.IsNullOrWhiteSpace(config.version))
-            {
-                PlayerSettings.bundleVersion = config.version;
-            }
-
-            // ビルド実行
-            string[] scenes = GetBuildScenePaths();
-            string buildPath = config.buildPath;
-            BuildOptions opt = BuildOptions.CompressWithLz4;
-
-            return BuildPipeline.BuildPlayer(scenes, buildPath, config.targetPlatform, opt);
         }
 
-        public static BuildReport BuildAndroid(MyBuildConfig config)
+        public static void SetAndroidSettings(MyBuildConfig config)
         {
             // 各種設定
             SetupAndroidUserBuildSettings(config);
             SetAndroidKeyStoreSetting(config);
-            SetupCommonSettings(config);
             SetAndroidArchitechture(config);
 
             // ビルドナンバーなどの更新
@@ -131,18 +124,26 @@ namespace BatchBuild
             {
                 PlayerSettings.Android.bundleVersionCode = int.Parse(config.buildNumber);
             }
+        }
 
-            if (!string.IsNullOrWhiteSpace(config.version))
+        private static string GetBuildPathOrDefault(MyBuildConfig config)
+        {
+            string buildPath = config.buildPath;
+
+            if (string.IsNullOrWhiteSpace(buildPath))
             {
-                PlayerSettings.bundleVersion = config.version;
+                if (config.targetPlatform == BuildTarget.StandaloneWindows ||
+                    config.targetPlatform == BuildTarget.StandaloneWindows64)
+                {
+                    buildPath = $"builds/{Application.productName}-{config.buildNumber}.exe";
+                }
+                else
+                {
+                    buildPath = $"builds/{Application.productName}-{config.buildNumber}";
+                }
             }
 
-            // ビルド実行
-            string[] scenes = GetBuildScenePaths();
-            string buildPath = config.buildPath;
-            BuildOptions opt = BuildOptions.CompressWithLz4;
-
-            return BuildPipeline.BuildPlayer(scenes, buildPath, config.targetPlatform, opt);
+            return buildPath;
         }
 
         private static void SetupCommonSettings(MyBuildConfig config)
@@ -160,6 +161,11 @@ namespace BatchBuild
                 EditorUserBuildSettings.connectProfiler = config.connectProfiler;
                 EditorUserBuildSettings.allowDebugging = config.allowDebugging;
                 EditorUserBuildSettings.symlinkLibraries = config.symlinkUnityLibraries;
+            }
+            
+            if (!string.IsNullOrWhiteSpace(config.version))
+            {
+                PlayerSettings.bundleVersion = config.version;
             }
         }
 
