@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace BatchBuild
 {
@@ -66,25 +67,31 @@ namespace BatchBuild
             else
             {
                 Debug.Log($"[ScriptLog] Failed Build {buildConfig.targetPlatform}");
-                Debug.Log(System.Environment.NewLine);
-                Debug.Log($"- Error Message Begin ---------------------------------");
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append($"=============== Error Message Begin ==========================" + System.Environment.NewLine);
                 for (int i = 0; i < report.steps.Length; i++)
                 {
                     var step = report.steps[i];
                     var msg  = step.messages;
                 
-                    Debug.Log($"STEP ({step.name})" + System.Environment.NewLine);
+                    sb.Append($"STEP ({step.name})" + System.Environment.NewLine);
 
                     for (int j = 0; j < msg.Length; j++)
                     {
-                        if (msg[j].type == LogType.Error)
+                        LogType type = msg[j].type;
+                        if (type == LogType.Error || type == LogType.Assert || type == LogType.Exception)
                         {
-                            Debug.Log(msg[j].content + System.Environment.NewLine);
+                            sb.Append(msg[j].content + System.Environment.NewLine);
                         }
                     }
+                    sb.Append("----------------------------------------------");
+                    sb.Append(System.Environment.NewLine);
                 }
-                Debug.Log(System.Environment.NewLine);
-                Debug.Log($"- Error Message Begin ---------------------------------");
+                sb.Append(System.Environment.NewLine);
+                sb.Append($"================= End ==================================");
+                
+                Debug.Log(sb.ToString());
             }
 
             // バッチモードの場合のみ、Editor を終了する
