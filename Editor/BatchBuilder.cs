@@ -57,7 +57,25 @@ namespace BatchBuild
             else
             {
                 Debug.Log($"[ScriptLog] Failed Build {buildConfig.targetPlatform}");
-                Debug.Log(System.Environment.NewLine + report + System.Environment.NewLine);
+                Debug.Log(System.Environment.NewLine);
+                Debug.Log($"- Error Message Begin ---------------------------------");
+                for (int i = 0; i < report.steps.Length; i++)
+                {
+                    var step = report.steps[i];
+                    var msg  = step.messages;
+                
+                    Debug.Log($"STEP ({step.name})" + System.Environment.NewLine);
+
+                    for (int j = 0; j < msg.Length; j++)
+                    {
+                        if (msg[j].type == LogType.Error)
+                        {
+                            Debug.Log(msg[j].content + System.Environment.NewLine);
+                        }
+                    }
+                }
+                Debug.Log(System.Environment.NewLine);
+                Debug.Log($"- Error Message Begin ---------------------------------");
             }
 
             // バッチモードの場合のみ、Editor を終了する
