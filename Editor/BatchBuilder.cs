@@ -154,11 +154,11 @@ namespace BatchBuild
             EditorUserBuildSettings.buildAppBundle = config.isRelease && config.buildAppBundle;
             EditorUserBuildSettings.androidBuildType = AndroidBuildType.Debug;
 
-            EditorUserBuildSettings.androidDebugMinification = config.debugMinification;
-            EditorUserBuildSettings.androidReleaseMinification = config.releaseMinification;
+            // EditorUserBuildSettings.androidDebugMinification = config.debugMinification;
+            // EditorUserBuildSettings.androidReleaseMinification = config.releaseMinification;
 
-            EditorUserBuildSettings.androidDebugMinification = AndroidMinification.None;
-            EditorUserBuildSettings.androidReleaseMinification = AndroidMinification.None;
+            // EditorUserBuildSettings.androidDebugMinification = AndroidMinification.None;
+            // EditorUserBuildSettings.androidReleaseMinification = AndroidMinification.None;
         }
 
         private static void SetAndroidKeyStoreSetting(MyBuildConfig config)
@@ -251,19 +251,19 @@ namespace BatchBuild
                         config.keyaliasPass = (args[i + 1]).ToString();
                         i += 1;
                         break;
-                    case "--minification":
-
-                        if (Enum.TryParse(args[i + 1], true, out AndroidMinification result))
-                        {
-                            config.debugMinification = result;
-                            config.releaseMinification = result;
-                        }
-                        else
-                        {
-                            Debug.LogError("無効な引数をスキップ: " + args[i + 1]);
-                        }
-                        i += 1;
-                        break;
+                    // case "--minification":
+                    //
+                    //     if (Enum.TryParse(args[i + 1], true, out AndroidMinification result))
+                    //     {
+                    //         config.debugMinification = result;
+                    //         config.releaseMinification = result;
+                    //     }
+                    //     else
+                    //     {
+                    //         Debug.LogError("無効な引数をスキップ: " + args[i + 1]);
+                    //     }
+                    //     i += 1;
+                    //     break;
                 }
             }
         }

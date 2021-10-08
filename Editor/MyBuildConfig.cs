@@ -18,8 +18,8 @@
         [Header("Android")]
         public bool buildAppBundle;
         public bool il2cpp;
-        public AndroidMinification debugMinification;
-        public AndroidMinification releaseMinification;
+        // public AndroidMinification debugMinification;
+        // public AndroidMinification releaseMinification;
         
         public string keystorePath;
         public string keystorePass;
