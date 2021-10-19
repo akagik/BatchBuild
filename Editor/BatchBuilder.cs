@@ -56,48 +56,89 @@ namespace BatchBuild
             string[] scenes = GetBuildScenePaths();
             BuildOptions opt = BuildOptions.CompressWithLz4;
             string buildPath = GetBuildPathOrDefault(buildConfig);
+            bool isSuccess = false;
+            string buildErrorLog = "";
 
-            BuildReport report = BuildPipeline.BuildPlayer(scenes, buildPath, buildConfig.targetPlatform, opt);
+            // ビルドメソッドを上書きしない場合は標準の方法でビルドする.
+            if (string.IsNullOrWhiteSpace(buildConfig.overrideBuildMethod))
+            {
+                BuildReport report = BuildPipeline.BuildPlayer(scenes, buildPath, buildConfig.targetPlatform, opt);
+                
+                // レポート表示
+                if (report.summary.result == BuildResult.Succeeded)
+                {
+                    isSuccess = true;
+                }
+                else
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append($"=============== Error Message Begin ==========================" + System.Environment.NewLine);
+                    for (int i = 0; i < report.steps.Length; i++)
+                    {
+                        var step = report.steps[i];
+                        var msg  = step.messages;
+                    
+                        sb.Append($"STEP ({step.name})" + System.Environment.NewLine);
 
-            // レポート表示
-            if (report.summary.result == BuildResult.Succeeded)
+                        for (int j = 0; j < msg.Length; j++)
+                        {
+                            LogType type = msg[j].type;
+                            if (type == LogType.Error || type == LogType.Assert || type == LogType.Exception)
+                            {
+                                sb.Append(msg[j].content + System.Environment.NewLine);
+                            }
+                        }
+                        sb.Append("----------------------------------------------");
+                        sb.Append(System.Environment.NewLine);
+                    }
+                    sb.Append(System.Environment.NewLine);
+                    sb.Append($"================= End ==================================");
+
+                    buildErrorLog = sb.ToString();
+                    isSuccess = false;
+                }
+            }
+            // ビルドメソッドを上書きしてビルドする.
+            else
+            {
+                if (OverrideBuildMethod.TryParse(buildConfig.overrideBuildMethod, out var method))
+                {
+                    if (method.TryGetType())
+                    {
+                        // static を前提でビルドメソッドをコールする.
+                        // 引数は以下を渡す.
+                        // 1. buildConfig
+                        // 2. buildPath
+                        isSuccess = (bool) method.methodInfo.Invoke(null, new object[] { buildConfig, buildPath });
+                    }
+                    else
+                    {
+                        Debug.Log("overrideBuildMethod で型名または MethodInfo の取得に失敗しました: " + buildConfig.overrideBuildMethod);
+                        isSuccess = false;
+                    }
+                }
+                else
+                {
+                    Debug.Log("overrideBuildMethod 名のパースに失敗しました.");
+                    isSuccess = false;
+                }
+            }
+
+            // ログの出力
+            if (isSuccess)
             {
                 Debug.Log($"[ScriptLog] Success Build {buildConfig.targetPlatform}");
             }
             else
             {
                 Debug.Log($"[ScriptLog] Failed Build {buildConfig.targetPlatform}");
-
-                StringBuilder sb = new StringBuilder();
-                sb.Append($"=============== Error Message Begin ==========================" + System.Environment.NewLine);
-                for (int i = 0; i < report.steps.Length; i++)
-                {
-                    var step = report.steps[i];
-                    var msg  = step.messages;
-                
-                    sb.Append($"STEP ({step.name})" + System.Environment.NewLine);
-
-                    for (int j = 0; j < msg.Length; j++)
-                    {
-                        LogType type = msg[j].type;
-                        if (type == LogType.Error || type == LogType.Assert || type == LogType.Exception)
-                        {
-                            sb.Append(msg[j].content + System.Environment.NewLine);
-                        }
-                    }
-                    sb.Append("----------------------------------------------");
-                    sb.Append(System.Environment.NewLine);
-                }
-                sb.Append(System.Environment.NewLine);
-                sb.Append($"================= End ==================================");
-                
-                Debug.Log(sb.ToString());
+                Debug.Log(buildErrorLog);
             }
 
             // バッチモードの場合のみ、Editor を終了する
             if (Application.isBatchMode)
             {
-                EditorApplication.Exit(report.summary.result == BuildResult.Succeeded ? 0 : 1);
+                EditorApplication.Exit(isSuccess ? 0 : 1);
             }
         }
 
@@ -280,6 +321,10 @@ namespace BatchBuild
                         break;
                     case "--keyalias-pass":
                         config.keyaliasPass = (args[i + 1]).ToString();
+                        i += 1;
+                        break;
+                    case "--override-build-method":
+                        config.overrideBuildMethod = (args[i + 1]).ToString();
                         i += 1;
                         break;
                     // case "--minification":

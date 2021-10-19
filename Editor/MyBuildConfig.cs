@@ -13,6 +13,10 @@
 
         public bool isRelease = false;
         public string commitId;
+        
+        // 標準のビルドメソッドを上書きする.
+        // 名前は "型名.メソッド名, アセンブリ名" または "型名.メソッド名" で指定する
+        public string overrideBuildMethod = "";
 
         // Android key store settings
         [Header("Android")] public bool buildAppBundle;
