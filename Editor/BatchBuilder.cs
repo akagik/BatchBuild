@@ -226,8 +226,10 @@ namespace BatchBuild
             EditorUserBuildSettings.buildAppBundle = config.isRelease && config.buildAppBundle;
             EditorUserBuildSettings.androidBuildType = AndroidBuildType.Debug;
 
-            // EditorUserBuildSettings.androidDebugMinification = config.debugMinification;
-            // EditorUserBuildSettings.androidReleaseMinification = config.releaseMinification;
+#if !UNITY_2019_1_OR_NEWER
+            EditorUserBuildSettings.androidDebugMinification = config.debugMinification;
+            EditorUserBuildSettings.androidReleaseMinification = config.releaseMinification;
+#endif
 
             // EditorUserBuildSettings.androidDebugMinification = AndroidMinification.None;
             // EditorUserBuildSettings.androidReleaseMinification = AndroidMinification.None;
@@ -327,19 +329,21 @@ namespace BatchBuild
                         config.overrideBuildMethod = (args[i + 1]).ToString();
                         i += 1;
                         break;
-                    // case "--minification":
-                    //
-                    //     if (Enum.TryParse(args[i + 1], true, out AndroidMinification result))
-                    //     {
-                    //         config.debugMinification = result;
-                    //         config.releaseMinification = result;
-                    //     }
-                    //     else
-                    //     {
-                    //         Debug.LogError("無効な引数をスキップ: " + args[i + 1]);
-                    //     }
-                    //     i += 1;
-                    //     break;
+#if !UNITY_2019_1_OR_NEWER
+                    case "--minification":
+                    
+                        if (Enum.TryParse(args[i + 1], true, out AndroidMinification result))
+                        {
+                            config.debugMinification = result;
+                            config.releaseMinification = result;
+                        }
+                        else
+                        {
+                            Debug.LogError("無効な引数をスキップ: " + args[i + 1]);
+                        }
+                        i += 1;
+                        break;
+#endif
                 }
             }
         }

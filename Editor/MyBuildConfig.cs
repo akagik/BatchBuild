@@ -22,8 +22,11 @@
         [Header("Android")] public bool buildAppBundle;
 
         public bool il2cpp;
-        // public AndroidMinification debugMinification;
-        // public AndroidMinification releaseMinification;
+        
+#if !UNITY_2019_1_OR_NEWER
+        public AndroidMinification debugMinification;
+        public AndroidMinification releaseMinification;
+#endif
 
         public string keystorePath;
         public string keystorePass;
