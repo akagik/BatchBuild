@@ -37,7 +37,7 @@ namespace BatchBuild
                 }
             }
 
-            Debug.Log($"[ScriptLog] Start Build {buildConfig.targetPlatform}({buildConfig.buildNumber}) - {buildConfig.version}");
+            Debug.Log($"[ScriptLog] Start Build {buildConfig.targetPlatform}({buildConfig.buildNumber}) - {buildConfig.bundleVersion}");
 
             // 各種設定
             SetupCommonSettings(buildConfig);
@@ -211,9 +211,9 @@ namespace BatchBuild
                 EditorUserBuildSettings.symlinkLibraries = config.symlinkUnityLibraries;
             }
             
-            if (!string.IsNullOrWhiteSpace(config.version))
+            if (!string.IsNullOrWhiteSpace(config.bundleVersion))
             {
-                PlayerSettings.bundleVersion = config.version;
+                PlayerSettings.bundleVersion = config.bundleVersion;
             }
         }
 
@@ -283,7 +283,8 @@ namespace BatchBuild
                         i += 1;
                         break;
                     case "--version":
-                        config.version = (args[i + 1]);
+                    case "--bundle-version":
+                        config.bundleVersion = (args[i + 1]);
                         i += 1;
                         break;
                     case "--build-app-bundle":

@@ -9,11 +9,11 @@
         public BuildTarget targetPlatform = BuildTarget.StandaloneWindows;
         public string buildPath;
         [SerializeField] private string _buildNumber;
-        public string version;
+        public string bundleVersion;
 
         public bool isRelease = false;
         public string commitId;
-        
+
         // 標準のビルドメソッドを上書きする.
         // 名前は "型名.メソッド名, アセンブリ名" または "型名.メソッド名" で指定する
         public string overrideBuildMethod = "";
@@ -22,7 +22,7 @@
         [Header("Android")] public bool buildAppBundle;
 
         public bool il2cpp;
-        
+
 #if !UNITY_2019_1_OR_NEWER
         public AndroidMinification debugMinification;
         public AndroidMinification releaseMinification;
