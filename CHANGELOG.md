@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this package will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [0.2.2] - 2023-06-07
+
+- [feat] --create-symbols オプションを追加
+- [update] obsolete フィールドの更新
+
 ## [0.2.1] - 2022-03-30
 
 - [fix] bundle-version オプション追加
