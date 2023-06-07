@@ -146,11 +146,11 @@ namespace BatchBuild
         {
             if (config.isRelease)
             {
-                EditorUserBuildSettings.iOSBuildConfigType = iOSBuildType.Release;
+                EditorUserBuildSettings.iOSXcodeBuildConfig = XcodeBuildConfig.Release;
             }
             else
             {
-                EditorUserBuildSettings.iOSBuildConfigType = iOSBuildType.Debug;
+                EditorUserBuildSettings.iOSXcodeBuildConfig = XcodeBuildConfig.Debug;
             }
 
             // ビルドナンバーなどの更新
@@ -201,14 +201,14 @@ namespace BatchBuild
                 EditorUserBuildSettings.development = false;
                 EditorUserBuildSettings.connectProfiler = false;
                 EditorUserBuildSettings.allowDebugging = false;
-                EditorUserBuildSettings.symlinkLibraries = false;
+                EditorUserBuildSettings.symlinkSources = false;
             }
             else
             {
                 EditorUserBuildSettings.development = config.developmentBuild;
                 EditorUserBuildSettings.connectProfiler = config.connectProfiler;
                 EditorUserBuildSettings.allowDebugging = config.allowDebugging;
-                EditorUserBuildSettings.symlinkLibraries = config.symlinkUnityLibraries;
+                EditorUserBuildSettings.symlinkSources = config.symlinkUnityLibraries;
             }
             
             if (!string.IsNullOrWhiteSpace(config.bundleVersion))
