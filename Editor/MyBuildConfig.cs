@@ -1,4 +1,6 @@
-﻿namespace BatchBuild
+﻿using System;
+
+namespace BatchBuild
 {
     using UnityEditor;
     using UnityEngine;
@@ -28,6 +30,8 @@
         public AndroidMinification releaseMinification;
 #endif
 
+        public string createSymbol;
+
         public string keystorePath;
         public string keystorePass;
         public string keyaliasName;
@@ -55,5 +59,19 @@
         public bool connectProfiler;
         public bool allowDebugging;
         public bool symlinkUnityLibraries;
+
+        public AndroidCreateSymbols GetAndroidCreateSymbols()
+        {
+            if (string.IsNullOrWhiteSpace(createSymbol))
+            {
+                return AndroidCreateSymbols.Disabled;
+            }
+            
+            if (Enum.TryParse(createSymbol, out AndroidCreateSymbols result))
+            {
+                return result;
+            }
+            return AndroidCreateSymbols.Disabled;
+        }
     }
 }

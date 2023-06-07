@@ -225,6 +225,7 @@ namespace BatchBuild
             EditorUserBuildSettings.exportAsGoogleAndroidProject = false;
             EditorUserBuildSettings.buildAppBundle = config.isRelease && config.buildAppBundle;
             EditorUserBuildSettings.androidBuildType = AndroidBuildType.Debug;
+            EditorUserBuildSettings.androidCreateSymbols = config.GetAndroidCreateSymbols();
 
 #if !UNITY_2019_1_OR_NEWER
             EditorUserBuildSettings.androidDebugMinification = config.debugMinification;
@@ -328,6 +329,10 @@ namespace BatchBuild
                         break;
                     case "--override-build-method":
                         config.overrideBuildMethod = (args[i + 1]).ToString();
+                        i += 1;
+                        break;
+                    case "--create-symbols":
+                        config.createSymbol = (args[i + 1]).ToString();
                         i += 1;
                         break;
 #if !UNITY_2019_1_OR_NEWER
